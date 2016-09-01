@@ -63,6 +63,7 @@ rtri = 0.0
 
 # Rotation angle for the quadrilateral.
 rquad = 0.0
+rquadSum = 0.0
 
 #    e-------f
 #   /|      /|
@@ -82,6 +83,9 @@ vertices['e'] = [-1.0, 1.0, -1.0]
 vertices['f'] = [1.0, 1.0, -1.0]
 vertices['g'] = [-1.0, -1.0, -1.0]
 vertices['h'] = [1.0, -1.0, -1.0]
+vNames = ['a','b','c','d','e','f','g','h']
+currentV = 0
+
 
 # A general OpenGL initialization function.  Sets all of the initial parameters. 
 def InitGL(Width, Height):				# We call this right after our OpenGL window is created.
@@ -111,14 +115,18 @@ def ReSizeGLScene(Width, Height):
 
 # The main drawing function. 
 def DrawGLScene():
-	global rtri, rquad, vertices
+	global rtri, rquad, rquadSum, vertices, vNames, currentV
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	# Clear The Screen And The Depth Buffer
+	glLoadIdentity()								# Reset The View
 
-	glLoadIdentity()
+	
 	glTranslatef(0.0, 0.0, -7.0)		# Move Right And Into The Screen
+
+	rquad += rquadSum
 	glRotatef(rquad,1.0,1.0,1.0)		# Rotate The Cube On X, Y & Z
-	glBegin(GL_QUADS)			# Start Drawing The Cube
+
+	glBegin(GL_QUADS)								# Start Drawing The Cube
 
 	# TOP face
 	glColor3f(0.0,1.0,0.0)			# Set The Color To Blue
@@ -176,19 +184,39 @@ def DrawGLScene():
 
 # The function called whenever a key is pressed. Note the use of Python tuples to pass in: (key, x, y)  
 def keyPressed(*args):
-	global vertices
+	global vertices, vNames, currentV, rquadSum
 	# If escape is pressed, kill everything.
 	if args[0] == ESCAPE:
 		glutDestroyWindow(window)
 		sys.exit()
-	elif args[0] == 'w':
-		vertices['b'][1]+=0.1
-	elif args[0] == 's':
-		vertices['b'][1]-=0.1
+
+	# X axis
 	elif args[0] == 'a':
-		vertices['b'][0]-=0.1
+		vertices[vNames[currentV]][0]-=0.1
 	elif args[0] == 'd':
-		vertices['b'][0]+=0.1
+		vertices[vNames[currentV]][0]+=0.1
+		
+	# Y axis
+	elif args[0] == 's':
+		vertices[vNames[currentV]][1]-=0.1
+	elif args[0] == 'w':
+		vertices[vNames[currentV]][1]+=0.1
+
+	# Z axis
+	elif args[0] == 'e':
+		vertices[vNames[currentV]][2]-=0.1
+	elif args[0] == 'q':
+		vertices[vNames[currentV]][2]+=0.1
+
+	# change vertix
+	elif args[0] == 'p':
+		currentV = (currentV+1)%8
+
+	# rotate
+	elif args[0] == 'o':
+		rquadSum = (rquadSum + 0.5)%1
+
+
 		
 def main():
 	global window
