@@ -75,16 +75,17 @@ rquadSum = 0.0
 # c-------d
 
 vertices = {}
-vertices['a'] = [-1.0, 1.0, 1.0]
-vertices['b'] = [1.0, 1.0, 1.0]
-vertices['c'] = [-1.0, -1.0, 1.0]
-vertices['d'] = [1.0, -1.0, 1.0]
-vertices['e'] = [-1.0, 1.0, -1.0]
-vertices['f'] = [1.0, 1.0, -1.0]
+vertices['a'] = [-1.0,  1.0,  1.0]
+vertices['b'] = [ 1.0,  1.0,  1.0]
+vertices['c'] = [-1.0, -1.0,  1.0]
+vertices['d'] = [ 1.0, -1.0,  1.0]
+vertices['e'] = [-1.0,  1.0, -1.0]
+vertices['f'] = [ 1.0,  1.0, -1.0]
 vertices['g'] = [-1.0, -1.0, -1.0]
-vertices['h'] = [1.0, -1.0, -1.0]
+vertices['h'] = [ 1.0, -1.0, -1.0]
 vNames = ['a','b','c','d','e','f','g','h']
 currentV = 0
+currentTime = 0
 
 
 # A general OpenGL initialization function.  Sets all of the initial parameters. 
@@ -115,7 +116,7 @@ def ReSizeGLScene(Width, Height):
 
 # The main drawing function. 
 def DrawGLScene():
-	global rtri, rquad, rquadSum, vertices, vNames, currentV
+	global rtri, rquad, rquadSum, vertices, vNames, currentV, currentTime
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	# Clear The Screen And The Depth Buffer
 	glLoadIdentity()								# Reset The View
@@ -125,6 +126,15 @@ def DrawGLScene():
 
 	rquad += rquadSum
 	glRotatef(rquad,1.0,1.0,1.0)		# Rotate The Cube On X, Y & Z
+
+	currentTime = (currentTime + 0.5)%10
+	if currentTime < 5:
+		glBegin(GL_TRIANGLES)       # Drawing Using Triangles
+		glColor3f(1.0,1.0,1.0)			# Set The Color To Violet
+		glVertex3f( vertices[vNames[currentV]][0]     , vertices[vNames[currentV]][1]+0.05,vertices[vNames[currentV]][2])
+		glVertex3f( vertices[vNames[currentV]][0]-0.05, vertices[vNames[currentV]][1]-0.05,vertices[vNames[currentV]][2])
+		glVertex3f( vertices[vNames[currentV]][0]+0.05, vertices[vNames[currentV]][1]-0.05,vertices[vNames[currentV]][2])
+		glEnd()                            				 # Finished Drawing The Triangle
 
 	glBegin(GL_QUADS)								# Start Drawing The Cube
 
@@ -136,11 +146,11 @@ def DrawGLScene():
 	glVertex3f(vertices['e'][0],vertices['e'][1],vertices['e'][2])
 
 	# BOTTOM face
-	glColor3f(1.0,0.5,0.0)			# Set The Color To Orange
-	glVertex3f(vertices['c'][0],vertices['c'][1],vertices['c'][2])
-	glVertex3f(vertices['d'][0],vertices['d'][1],vertices['d'][2])
-	glVertex3f(vertices['h'][0],vertices['h'][1],vertices['h'][2])
-	glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
+	# glColor3f(1.0,0.5,0.0)			# Set The Color To Orange
+	# glVertex3f(vertices['c'][0],vertices['c'][1],vertices['c'][2])
+	# glVertex3f(vertices['d'][0],vertices['d'][1],vertices['d'][2])
+	# glVertex3f(vertices['h'][0],vertices['h'][1],vertices['h'][2])
+	# glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
 
 	# FRONT face
 	glColor3f(1.0,0.0,0.0)			# Set The Color To Red
@@ -150,18 +160,18 @@ def DrawGLScene():
 	glVertex3f(vertices['c'][0],vertices['c'][1],vertices['c'][2])
 
 	# BACK face
-	glColor3f(1.0,1.0,0.0)			# Set The Color To Yellow
-	glVertex3f(vertices['e'][0],vertices['e'][1],vertices['e'][2])
-	glVertex3f(vertices['f'][0],vertices['f'][1],vertices['f'][2])
-	glVertex3f(vertices['h'][0],vertices['h'][1],vertices['h'][2])
-	glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
+	# glColor3f(1.0,1.0,0.0)			# Set The Color To Yellow
+	# glVertex3f(vertices['e'][0],vertices['e'][1],vertices['e'][2])
+	# glVertex3f(vertices['f'][0],vertices['f'][1],vertices['f'][2])
+	# glVertex3f(vertices['h'][0],vertices['h'][1],vertices['h'][2])
+	# glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
 
-	# LEFT face
-	glColor3f(0.0,0.0,1.0)			# Set The Color To Blue
-	glVertex3f(vertices['a'][0],vertices['a'][1],vertices['a'][2])
-	glVertex3f(vertices['e'][0],vertices['e'][1],vertices['e'][2])
-	glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
-	glVertex3f(vertices['c'][0],vertices['c'][1],vertices['c'][2])
+	# # LEFT face
+	# glColor3f(0.0,0.0,1.0)			# Set The Color To Blue
+	# glVertex3f(vertices['a'][0],vertices['a'][1],vertices['a'][2])
+	# glVertex3f(vertices['e'][0],vertices['e'][1],vertices['e'][2])
+	# glVertex3f(vertices['g'][0],vertices['g'][1],vertices['g'][2])
+	# glVertex3f(vertices['c'][0],vertices['c'][1],vertices['c'][2])
 
 	# RIGHT face
 	glColor3f(1.0,0.0,1.0)			# Set The Color To Violet
@@ -215,7 +225,6 @@ def keyPressed(*args):
 	# rotate
 	elif args[0] == 'o':
 		rquadSum = (rquadSum + 0.5)%1
-
 
 		
 def main():
