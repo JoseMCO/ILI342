@@ -90,7 +90,7 @@ counter = 0
 timeLeft = 10
 textures = []
 buffers = []
-gameState = 0
+gameState = -1
 ready = False
 
 port = 0
@@ -234,15 +234,18 @@ def DrawGLScene():
 	gluLookAt(100.5, 100.5, 5, 100.5, 100.5, 0, 0, 1, 0)
 
 	if port > 0 and ready:
-		if timeLeft < 1 and gameState == 0:
+		if timeLeft < 1 and gameState == -1:
 			print "waiting for the veredict..."
 			sock.send("option:%s" % currentO)
-			if sock.recv() == "loss":
-				gameState = -1
-			else:
+			veredict = sock.recv()
+			if veredict == "win":
+				gameState = 2
+			elif veredict == "loss":
 				gameState = 1
+			else:
+				gameState = 0
 		else:
-			gameState = 0
+			gameState = -1
 			sock.send("Tick!")
 			timeLeft = int(sock.recv())
 			print "Time left: %ss" % timeLeft
@@ -307,7 +310,7 @@ def DrawGLScene():
 			glVertex3f( vertices[vNames[currentV]][0]+0.05, vertices[vNames[currentV]][1]-0.05,0.01)
 			glEnd()                     # Finished Drawing The Triangle
 
-	elif timeLeft==0 and gameState == -1:
+	elif timeLeft==0 and gameState == 1:
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
 		DrawTextureQuad(b,f,h,d,currentO+11)
 
@@ -317,7 +320,7 @@ def DrawGLScene():
 		DrawColorQuad(a,b,f,e,(1.0,0.0,0.0))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
 
-	elif timeLeft==0 and gameState == 1:
+	elif timeLeft==0 and gameState == 2:
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
 		DrawTextureQuad(b,f,h,d,currentO+11)
 
@@ -325,6 +328,16 @@ def DrawGLScene():
 		# DrawTextureQuad(a,b,d,c,len(textures)-1)
 
 		DrawColorQuad(a,b,f,e,(0.0,1.0,0.0))
+		# DrawTextureQuad(e,f,b,a,timeLeft)
+
+	elif timeLeft==0 and gameState == 0:
+		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
+		DrawTextureQuad(b,f,h,d,currentO+11)
+
+		DrawColorQuad(a,b,d,c,(0.5,0.5,0.5))
+		# DrawTextureQuad(a,b,d,c,len(textures)-1)
+
+		DrawColorQuad(a,b,f,e,(0.5,0.5,0.5))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
 
 	else:
@@ -376,7 +389,7 @@ def keyPressed(*args):
 	elif args[0] == ' ':
 		if not ready:
 			ready = True
-		elif gameState == 0:
+		elif gameState == -1:
 			currentO = (currentO+1)%5
 
 def main():
