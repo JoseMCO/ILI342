@@ -1,6 +1,7 @@
 import time
 import zmq
 import math
+import sys
 
 # 0 -> tie, 1 -> p1, 2 -> p2
 winners = [
@@ -11,22 +12,25 @@ winners = [
     [  1,     2,   2,    0,    1  ], # Fight
     [  2,     1,   1,    2,    0  ], # Water
 ]
+ip = "127.0.0.1"
+if len(sys.argv) > 1:
+	ip = sys.argv[1]
 
 # ZeroMQ Context
 context = zmq.Context()
 
 # Define the socket using the "Context"
 game1 = context.socket(zmq.REP)
-game1.bind("tcp://127.0.0.1:9001")
+game1.bind("tcp://%s:9001" % ip)
 game2 = context.socket(zmq.REP)
-game2.bind("tcp://127.0.0.1:9002")
+game2.bind("tcp://%s:9002" % ip)
 
 seconds = 10
 
 while True:
     print "Time left: %ss" % seconds
-    print game1.recv()
-    print game2.recv()
+    print "9001: %s" % game1.recv()
+    print "9002: %s" % game2.recv()
     game1.send("%s" % (int(math.ceil(seconds))))
     game2.send("%s" % (int(math.ceil(seconds))))
     seconds -= 0.2

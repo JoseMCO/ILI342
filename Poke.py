@@ -53,10 +53,10 @@ import sys
 # Some api in the chain is translating the keystrokes to this octal string
 # so instead of saying: ESCAPE = 27, we use the following.
 ESCAPE 	= '\033'
-LEFT		= '\037'
-UP 			= '\038'
+LEFT	= '\037'
+UP 		= '\038'
 RIGHT 	= '\039'
-DOWN 		= '\040'
+DOWN 	= '\040'
 
 # Number of the glut window.
 window = 0
@@ -247,6 +247,7 @@ def DrawGLScene():
 				gameState = 0
 		else:
 			gameState = -1
+			print "sending tick"
 			sock.send("Tick!")
 			timeLeft = int(sock.recv())
 			print "Time left: %ss" % timeLeft
