@@ -95,29 +95,30 @@ ready = False
 
 port = 0
 if len(sys.argv) > 1:
-	port = int(sys.argv[1])
+	server = sys.argv[1]
+	port = int(server.split(':')[1])
 	# ZeroMQ Context
 	context = zmq.Context()
 	# Define the socket using the "Context"
 	sock = context.socket(zmq.REQ)
-	sock.connect("tcp://127.0.0.1:%s" % port)
+	sock.connect("tcp://%s" % server)
 
 
 def MidPoints(p, q, z=0.01):
-	xdif = (p[0]-q[0])/3.0
-	ydif = (p[1]-q[1])/3.0
+	xdif = (q[0]-p[0])/3.0
+	ydif = (q[1]-p[1])/3.0
 	if xdif > 0:
-		x1 = q[0]+xdif
-		x2 = q[0]+(xdif*2)
+		x1 = p[0]+xdif
+		x2 = p[0]+(xdif*2)
 	else:
-		x1 = p[0]+(xdif*-1)
-		x2 = p[0]+(xdif*-2)
-	if ydif < 0:
-		y1 = q[1]+ydif
-		y2 = q[1]+(ydif*2)
+		x2 = q[0]+(xdif*-1)
+		x1 = q[0]+(xdif*-2)
+	if ydif > 0:
+		y1 = p[1]+ydif
+		y2 = p[1]+(ydif*2)
 	else:
-		y1 = p[1]+(ydif*-1)
-		y2 = p[1]+(ydif*-2)
+		y2 = q[1]+(ydif*-1)
+		y1 = q[1]+(ydif*-2)
 
 	return [x1,y1,z],[x2,y2,z]
 
@@ -257,9 +258,6 @@ def DrawGLScene():
 				timeLeft = timeLeft-1
 			elif gameState:
 				timeLeft = 10
-				gameState = False
-			else:
-				gameState = True
 			currentTime = time.time()
 
 
@@ -272,84 +270,121 @@ def DrawGLScene():
 	# | /     | /
 	# c-------d
 
-	# a----f01---f02----b
+	# a----l01---l02----b
 	# |  1  |  2  |  3  |
-	# f03--f04---f05--f06
+	# l03--l04---l05--l06
 	# |  4  |  5  |  6  |
-	# f07--f08---f09--f10
+	# l07--l08---l09--l10
 	# |  7  |  8  |  9  |
-	# c----f11---f12----d
+	# c----l11---l12----d
+
+	# e----t01---t02----f
+	# |  1  |  2  |  3  |
+	# t03--t04---t05--t06
+	# |  4  |  5  |  6  |
+	# t07--t08---t09--t10
+	# |  7  |  8  |  9  |
+	# a----t11---t12----b
 
 	a = vertices['a'];b = vertices['b'];c = vertices['c'];d = vertices['d']
 	e = vertices['e'];f = vertices['f'];g = vertices['g'];h = vertices['h']
-	f01,f02 = MidPoints(a,b,0);f03,f07 = MidPoints(a,c,0);f06,f10 = MidPoints(b,d,0);f11,f12 = MidPoints(c,d,0)
-	f04,f05 = MidPoints(f03,f06,0);f08,f09 = MidPoints(f07,f10,0)
+	l01,l02 = MidPoints(a,b,0);l07,l03 = MidPoints(c,a,0);l10,l06 = MidPoints(d,b,0);l11,l12 = MidPoints(c,d,0)
+	l04,l05 = MidPoints(l03,l06,0);l08,l09 = MidPoints(l07,l10,0)
 
-	mm = [a,f01,f02,b,f03,f04,f05,f06,f07,f08,f09,f10,c,f11,f12,d]
+	t01,t02 = MidPoints(e,f,0);t07,t03 = MidPoints(a,e,0);t10,t06 = MidPoints(b,f,0);t11,t12 = MidPoints(a,b,0)
+	t04,t05 = MidPoints(t03,t06,0);t08,t09 = MidPoints(t07,t10,0)
+
+	lp = [a,l01,l02,b,l03,l04,l05,l06,l07,l08,l09,l10,c,l11,l12,d]
+	tp = [e,t01,t02,f,t03,t04,t05,t06,t07,t08,t09,t10,a,t11,t12,b]
 	options = [
-		[  a,f01,f04,f03],
-		# [f01,f02,f05,f04],
-		[f02,  b,f06,f05],
-		# [f03,f04,f08,f07],
-		[f04,f05,f09,f08],
-		# [f05,f06,f10,f09],
-		[f07,f08,f11,  c],
-		# [f08,f09,f12,f11],
-		[f09,f10,  d,f12],
+		[  a,l01,l04,l03],
+		# [l01,l02,l05,l04],
+		[l02,  b,l06,l05],
+		# [l03,l04,l08,l07],
+		[l04,l05,l09,l08],
+		# [l05,l06,l10,l09],
+		[l07,l08,l11,  c],
+		# [l08,l09,l12,l11],
+		[l09,l10,  d,l12],
+	]
+	tOptions = [
+		[  e,t01,t04,t03],
+		# [t01,t02,t05,t04],
+		[t02,  f,t06,t05],
+		# [t03,t04,t08,t07],
+		[t04,t05,t09,t08],
+		# [t05,t06,t10,t09],
+		[t07,t08,t11,  a],
+		# [t08,t09,t12,t11],
+		[t09,t10,  b,t12],
 	]
 
 	if not ready:
 		DrawColorQuad(a,b,d,c,(1.0,0.0,0.0))
 		DrawColorQuad(a,b,f,e,(0.0,1.0,0.0))
 		DrawColorQuad(b,f,h,d,(0.0,0.0,1.0))
-		if currentTime%2:
+		if int(currentTime)%2:
 			glBegin(GL_TRIANGLES)       # Drawing Using Triangles
-			glColor3f(1.0,1.0,1.0)		# Set The Color To Blue
+			glColor3f(0.0,1.0,1.0)		# Set The Color To Blue
 			glVertex3f( vertices[vNames[currentV]][0]     , vertices[vNames[currentV]][1]+0.05,0.01)
 			glVertex3f( vertices[vNames[currentV]][0]-0.05, vertices[vNames[currentV]][1]-0.05,0.01)
 			glVertex3f( vertices[vNames[currentV]][0]+0.05, vertices[vNames[currentV]][1]-0.05,0.01)
 			glEnd()                     # Finished Drawing The Triangle
 
+		if port == 0:
+			num = int(currentTime)%len(tp)
+			glBegin(GL_TRIANGLES)       # Drawing Using Triangles
+			glColor3f(1.0,1.0,1.0)		# Set The Color To Blue
+			glVertex3f( tp[num][0]     , tp[num][1]+0.03,0.01)
+			glVertex3f( tp[num][0]-0.03, tp[num][1]-0.03,0.01)
+			glVertex3f( tp[num][0]+0.03, tp[num][1]-0.03,0.01)
+
+			glVertex3f( lp[num][0]     , lp[num][1]+0.03,0.01)
+			glVertex3f( lp[num][0]-0.03, lp[num][1]-0.03,0.01)
+			glVertex3f( lp[num][0]+0.03, lp[num][1]-0.03,0.01)
+			glEnd()                     # Finished Drawing The Triangle
+			currentTime+=0.05
+
 	elif timeLeft==0 and gameState == 1:
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
-		DrawTextureQuad(b,f,h,d,currentO+11)
+		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
 		DrawColorQuad(a,b,d,c,(1.0,0.0,0.0))
 		# DrawTextureQuad(a,b,d,c,len(textures)-1)
 
-		DrawColorQuad(a,b,f,e,(1.0,0.0,0.0))
+		DrawColorQuad(t07,t10,b,a,(1.0,0.0,0.0))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
 
 	elif timeLeft==0 and gameState == 2:
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
-		DrawTextureQuad(b,f,h,d,currentO+11)
+		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
 		DrawColorQuad(a,b,d,c,(0.0,1.0,0.0))
 		# DrawTextureQuad(a,b,d,c,len(textures)-1)
 
-		DrawColorQuad(a,b,f,e,(0.0,1.0,0.0))
+		DrawColorQuad(t07,t10,b,a,(0.0,1.0,0.0))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
 
 	elif timeLeft==0 and gameState == 0:
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
-		DrawTextureQuad(b,f,h,d,currentO+11)
+		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
 		DrawColorQuad(a,b,d,c,(0.5,0.5,0.5))
 		# DrawTextureQuad(a,b,d,c,len(textures)-1)
 
-		DrawColorQuad(a,b,f,e,(0.5,0.5,0.5))
+		DrawColorQuad(t07,t10,b,a,(0.5,0.5,0.5))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
 
 	else:
 		DrawColorSquare(options[currentO][0],options[currentO][1],options[currentO][2],options[currentO][3],(0.0,1.0,0.0))
-		DrawColorQuad(b,f,h,d,(0.0,0.0,0.0))
+		DrawColorQuad(e,f,b,a,(0.0,0.0,0.0))
 		# DrawTextureQuad(b,f,h,d,currentO+11)
 
 		# DrawColorQuad(a,b,d,c,(0.0,0.0,1.0))
 		DrawTextureQuad(a,b,d,c,len(textures)-1)
 
 		# DrawColorQuad(a,b,f,e,(1.0,0.0,0.0))
-		DrawTextureQuad(e,f,b,a,timeLeft)
+		DrawTextureQuad(b,f,h,d,timeLeft)
 
 	#  since this is double buffered, swap the buffers to display what just got drawn.
 	glutSwapBuffers()
