@@ -164,6 +164,10 @@ def InitGL(Width, Height):				# We call this right after our OpenGL window is cr
 				"energies/energy-fight.bmp",
 				"energies/energy-water.bmp",
 				"energies/energy.bmp",
+				"battle/vs.bmp",
+				"battle/tie.bmp",
+				"battle/winner.bmp",
+				"battle/loser.bmp",
 			]
 	LoadTextures(images)
 
@@ -350,8 +354,8 @@ def DrawGLScene():
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
 		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
-		DrawColorQuad(a,b,d,c,(1.0,0.0,0.0))
-		# DrawTextureQuad(a,b,d,c,len(textures)-1)
+		# DrawColorQuad(a,b,d,c,(1.0,0.0,0.0))
+		DrawTextureQuad(t07,t10,b,a,len(textures)-1)
 
 		DrawColorQuad(t07,t10,b,a,(1.0,0.0,0.0))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
@@ -360,8 +364,8 @@ def DrawGLScene():
 		# DrawColorQuad(b,f,h,d,(0.0,1.0,0.0))
 		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
-		DrawColorQuad(a,b,d,c,(0.0,1.0,0.0))
-		# DrawTextureQuad(a,b,d,c,len(textures)-1)
+		# DrawColorQuad(a,b,d,c,(0.0,1.0,0.0))
+		DrawTextureQuad(t07,t10,b,a,len(textures)-2)
 
 		DrawColorQuad(t07,t10,b,a,(0.0,1.0,0.0))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
@@ -371,7 +375,7 @@ def DrawGLScene():
 		DrawTextureQuad(t05,t06,t10,t09,currentO+11)
 
 		DrawColorQuad(a,b,d,c,(0.5,0.5,0.5))
-		# DrawTextureQuad(a,b,d,c,len(textures)-1)
+		DrawTextureQuad(t07,t10,b,a,len(textures)-3)
 
 		DrawColorQuad(t07,t10,b,a,(0.5,0.5,0.5))
 		# DrawTextureQuad(e,f,b,a,timeLeft)
@@ -382,7 +386,7 @@ def DrawGLScene():
 		# DrawTextureQuad(b,f,h,d,currentO+11)
 
 		# DrawColorQuad(a,b,d,c,(0.0,0.0,1.0))
-		DrawTextureQuad(a,b,d,c,len(textures)-1)
+		DrawTextureQuad(a,b,d,c,len(textures)-5)
 
 		# DrawColorQuad(a,b,f,e,(1.0,0.0,0.0))
 		DrawTextureQuad(b,f,h,d,timeLeft)
@@ -417,7 +421,7 @@ def keyPressed(*args):
 	# change pickV
 	elif args[0] == 'v':
 		if pickV == 0.1 :
-			pickV = 0.05
+			pickV = 0.01
 		else :
 			pickV = 0.1
 
